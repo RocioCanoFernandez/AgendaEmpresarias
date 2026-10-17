@@ -18,8 +18,8 @@
     href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%231d1b1a'/%3E%3Cpath d='M0 0h10v64H0z' fill='%23e66f2d'/%3E%3Ctext x='36' y='42' text-anchor='middle' font-family='Georgia,serif' font-weight='800' font-size='26' fill='white'%3EES%3C/text%3E%3C/svg%3E"
   />
 
-  <link rel="stylesheet" href="./styles.css?v=2" />
-  <script src="./app.js?v=2" defer></script>
+  <link rel="stylesheet" href="./styles.css?v=3" />
+  <script src="./app.js?v=3" defer></script>
 </head>
 <body>
 
@@ -244,9 +244,12 @@
         <h2 class="font-heading" style="font-size: 1.1rem; margin: 0; color: #1d1b1a;">
           Convocatorias y Representación (<span id="events-count-label">0</span>)
         </h2>
-        <div style="display: flex; gap: 0.5rem;">
-          <button type="button" id="btn-export-csv" class="btn btn-outline btn-sm">
-            ⬇ Descargar CSV / Excel
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button type="button" id="btn-export-my-csv" class="btn btn-outline btn-sm" title="Descargar solo los eventos a los que tú has confirmado que vas">
+            👤⬇ Descargar Mis Eventos (CSV / Excel)
+          </button>
+          <button type="button" id="btn-export-csv" class="btn btn-outline btn-sm" title="Descargar la agenda completa de todos los eventos">
+            ⬇ Descargar Todos los Eventos (CSV / Excel)
           </button>
         </div>
       </div>

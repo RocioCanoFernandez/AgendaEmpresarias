@@ -148,40 +148,21 @@ const DEFAULT_EQUIPO = [
 ];
 
 // ----------------------------------------------------------------------------
-// 2. EVENTO DEMO INICIAL (Solo si aún no hay eventos en el Google Sheet)
-// Por qué: incluye el caso real citado por Rocío (Evento de Prodetur del 20 de
-// noviembre) para que al abrir la aplicación se visualice inmediatamente cómo
-// funciona el sistema de plazas y confirmaciones.
+// 2. EVENTOS INICIALES VACÍOS (Agenda 100% limpia)
+// Por qué: empieza sin eventos de prueba para que muestre únicamente las
+// convocatorias reales cargadas desde el Google Sheet o creadas por la Junta.
 // ----------------------------------------------------------------------------
-const INITIAL_SAMPLE_EVENTS = [
-  {
-    id_evento: 'EVT-20261120-PROD',
-    titulo: 'Encuentro Provincial de Empresarias y Liderazgo · Prodetur',
-    organizador: 'Prodetur · Diputación de Sevilla',
-    tipo_evento: 'Institucional',
-    fecha_inicio: '2026-11-20',
-    hora_inicio: '10:30',
-    fecha_fin: '2026-11-20',
-    hora_fin: '13:30',
-    lugar: 'Sede Prodetur · Avda. Menéndez Pelayo 32, Sevilla',
-    enlace_evento: 'https://www.prodetur.es',
-    plazas_representacion: '3',
-    estado: 'Confirmado',
-    creado_por: 'Rocío Cano Fernández-Piedra',
-    fecha_registro: '2026-10-17 23:00:00',
-    observaciones: 'Acto institucional clave. Conviene que asistamos entre 2 y 3 representantes de la Junta Directiva.'
-  }
-];
+const INITIAL_SAMPLE_EVENTS = [];
 
 // ----------------------------------------------------------------------------
 // 3. ESTADO GLOBAL DE LA APLICACIÓN
 // ----------------------------------------------------------------------------
 const STORAGE_KEYS = {
-  CONFIG: 'es_agenda_config_v1',
-  SESSION: 'es_agenda_session_v1',
-  CACHE_EVENTOS: 'es_agenda_eventos_v1',
-  CACHE_RESPUESTAS: 'es_agenda_respuestas_v1',
-  CACHE_EQUIPO: 'es_agenda_equipo_v1'
+  CONFIG: 'es_agenda_config_v2',
+  SESSION: 'es_agenda_session_v2',
+  CACHE_EVENTOS: 'es_agenda_eventos_v2',
+  CACHE_RESPUESTAS: 'es_agenda_respuestas_v2',
+  CACHE_EQUIPO: 'es_agenda_equipo_v2'
 };
 
 const state = {
@@ -194,7 +175,7 @@ const state = {
   authenticated: false,
   isOnlineSync: false,
   currentView: 'both', // 'both' | 'list' | 'calendar' | 'team'
-  calendarMonth: new Date(2026, 10, 1), // Noviembre 2026 (mes 10 en base 0) o mes actual
+  calendarMonth: new Date(2026, 10, 1), // Se actualiza al mes actual al cargar
   selectedDayFilter: null, // 'YYYY-MM-DD' si se pulsa un día concreto del calendario
   filters: {
     search: '',
@@ -233,6 +214,10 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 function loadLocalState() {
   try {
+    // Limpiar evento de ejemplo de la versión v1 si existía en el navegador
+    localStorage.removeItem('es_agenda_eventos_v1');
+    localStorage.removeItem('es_agenda_respuestas_v1');
+
     const savedCfg = localStorage.getItem(STORAGE_KEYS.CONFIG);
     if (savedCfg) {
       const parsed = JSON.parse(savedCfg);
@@ -240,7 +225,7 @@ function loadLocalState() {
       if (parsed.pin) state.config.pin = String(parsed.pin);
     }
 
-    const savedSession = localStorage.getItem(STORAGE_KEYS.SESSION);
+    const savedSession = localStorage.getItem(STORAGE_KEYS.SESSION) || localStorage.getItem('es_agenda_session_v1');
     if (savedSession) {
       const sess = JSON.parse(savedSession);
       if (sess.authenticated && sess.activeMemberId) {
@@ -253,7 +238,7 @@ function loadLocalState() {
     if (cachedEventos) {
       state.eventos = JSON.parse(cachedEventos);
     } else {
-      state.eventos = [...INITIAL_SAMPLE_EVENTS];
+      state.eventos = [];
     }
 
     const cachedRespuestas = localStorage.getItem(STORAGE_KEYS.CACHE_RESPUESTAS);
@@ -351,8 +336,7 @@ async function syncFromN8n(showFeedback = true) {
       if (Array.isArray(data.equipo) && data.equipo.length > 0) {
         state.equipo = mergeEquipoWithDefaults(data.equipo);
       }
-      // Si el Google Sheet ya tiene eventos o si ya habíamos sincronizado antes
-      if (Array.isArray(data.eventos) && data.eventos.length > 0) {
+      if (Array.isArray(data.eventos)) {
         state.eventos = data.eventos.map(normalizeEventoRow);
       }
       if (Array.isArray(data.respuestas)) {
@@ -1197,16 +1181,31 @@ function copyEventForWhatsApp(id_evento) {
 }
 
 /**
- * Descarga un archivo CSV compatible con Excel con todos los eventos y quiénes asisten.
+ * Descarga un archivo CSV compatible con Excel.
+ * - Si `onlyMine = false`: descarga todos los eventos de la agenda.
+ * - Si `onlyMine = true`: descarga exclusivamente los eventos a los que la
+ *   usuaria activa ha confirmado que asiste ("Voy").
  */
-function exportAgendaToCsv() {
+function exportAgendaToCsv(onlyMine = false) {
+  const active = getActiveMember();
+  const sourceEvents = onlyMine
+    ? state.eventos.filter(ev =>
+        getGoingForEvent(ev.id_evento).some(r => r.id_integrante === state.activeMemberId)
+      )
+    : state.eventos;
+
+  if (onlyMine && sourceEvents.length === 0) {
+    showToast('Aún no tienes eventos confirmados con "Voy" para exportar.');
+    return;
+  }
+
   const headers = [
     'id_evento', 'titulo', 'organizador', 'tipo_evento', 'fecha_inicio',
     'hora_inicio', 'fecha_fin', 'hora_fin', 'lugar', 'plazas_representacion',
     'estado', 'representantes_confirmadas', 'no_pueden', 'observaciones'
   ];
 
-  const rows = state.eventos.map(ev => {
+  const rows = sourceEvents.map(ev => {
     const resps = getResponsesForEvent(ev.id_evento);
     const going = resps.filter(r => r.respuesta === 'Voy').map(r => r.nombre_apellidos).join(' | ');
     const notGoing = resps.filter(r => r.respuesta === 'No puedo').map(r => r.nombre_apellidos).join(' | ');
@@ -1223,7 +1222,13 @@ function exportAgendaToCsv() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `Agenda_Comite_Empresarias_Sevillanas_${new Date().toISOString().slice(0, 10)}.csv`;
+  const dateStr = new Date().toISOString().slice(0, 10);
+  const memberSlug = active
+    ? active.nombre_apellidos.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '_')
+    : 'Integrante';
+  a.download = onlyMine
+    ? `Mis_Eventos_${memberSlug}_${dateStr}.csv`
+    : `Agenda_Completa_Empresarias_Sevillanas_${dateStr}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -1484,8 +1489,9 @@ function setupEventListeners() {
     });
   });
 
-  // Exportar CSV
-  document.getElementById('btn-export-csv')?.addEventListener('click', exportAgendaToCsv);
+  // Exportar CSV (Mis Eventos o Todos los Eventos)
+  document.getElementById('btn-export-my-csv')?.addEventListener('click', () => exportAgendaToCsv(true));
+  document.getElementById('btn-export-csv')?.addEventListener('click', () => exportAgendaToCsv(false));
 
   // Configuración n8n
   document.getElementById('btn-sync-settings')?.addEventListener('click', () => {
