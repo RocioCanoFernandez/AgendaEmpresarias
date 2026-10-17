@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="theme-color" content="#1d1b1a" />
+  <title>Agenda Institucional · Comité y Vocales · Empresarias Sevillanas</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Icono con la S naranja de Empresarias Sevillanas -->
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%231d1b1a'/%3E%3Cpath d='M0 0h10v64H0z' fill='%23e66f2d'/%3E%3Ctext x='36' y='42' text-anchor='middle' font-family='Georgia,serif' font-weight='800' font-size='26' fill='white'%3EES%3C/text%3E%3C/svg%3E"
+  />
+
+  <link rel="stylesheet" href="./styles.css?v=2" />
+  <script src="./app.js?v=2" defer></script>
+</head>
+<body>
+
+  <!-- ========================================================================
+       PANTALLA DE ACCESO (GATEWAY) PARA EL COMITÉ, VOCALES Y TÉCNICO
+       Incluye el logotipo oficial de Empresarias Sevillanas.
+       ======================================================================== -->
+  <div id="auth-gate" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 460px;">
+      <div class="modal-header" style="border-bottom: 3px solid #e66f2d; flex-direction: column; align-items: flex-start; gap: 0.6rem;">
+        <img src="./logo-empresarias.png" alt="Empresarias Sevillanas" class="brand-logo" style="height: 54px;" />
+        <div>
+          <h1 class="brand-title">Agenda Institucional de Junta Directiva</h1>
+          <p class="brand-subtitle">Comité Ejecutivo, Vocales y Secretaría Técnica</p>
+        </div>
+      </div>
+      <form id="login-form" class="modal-body" style="display: flex; flex-direction: column; gap: 1rem;">
+        <p style="margin: 0; font-size: 0.87rem; color: #2c2927;">
+          Selecciona tu nombre dentro de la Junta Directiva e introduce la clave de acceso para consultar el calendario, registrar convocatorias y confirmar representación institucional.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label" for="login-member-select">¿Quién eres?</label>
+          <select id="login-member-select" class="select-field" required>
+            <!-- Se puebla dinámicamente desde EQUIPO_AUTORIZADO -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="login-pin-input">Clave de acceso Junta Directiva</label>
+          <input
+            type="password"
+            id="login-pin-input"
+            class="input-field"
+            placeholder="Introduce el código PIN (ej. 2026)"
+            required
+          />
+          <span id="login-error" class="hidden" style="color: #b94817; font-size: 0.78rem; font-weight: 600;">
+            Clave incorrecta. Consulta el código PIN interno de la Junta Directiva.
+          </span>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.7rem;">
+          Entrar en la Agenda de Empresarias Sevillanas
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       CABECERA EJECUTIVA PRINCIPAL CON LOGO EMPRESARIAS SEVILLANAS
+       ======================================================================== -->
+  <header class="top-header">
+    <div class="header-container">
+      <div class="brand-block">
+        <img src="./logo-empresarias.png" alt="Empresarias Sevillanas" class="brand-logo" />
+        <div class="brand-divider"></div>
+        <div>
+          <h1 class="brand-title">Agenda del Comité y Vocales</h1>
+          <p class="brand-subtitle">Gestión de convocatorias y representación institucional</p>
+        </div>
+      </div>
+
+      <div class="user-bar">
+        <!-- Indicador de sincronización con Google Sheets vía n8n -->
+        <button type="button" id="btn-sync-settings" class="active-user-pill" title="Configuración y estado de conexión con n8n / Google Sheets" style="cursor: pointer;">
+          <span id="sync-status-dot" class="sync-dot online"></span>
+          <span id="sync-status-text">Google Sheets conectado</span>
+        </button>
+
+        <!-- Selector rápido para cambiar de integrante activa -->
+        <div class="active-user-pill">
+          <span style="color: #6e6862;">Actuando como:</span>
+          <strong id="active-user-name">Rocío Cano</strong>
+          <button type="button" id="btn-switch-user" class="btn-ghost" style="border:none; padding: 0.1rem 0.35rem; font-size: 0.74rem; cursor:pointer; text-decoration: underline;">
+            Cambiar
+          </button>
+        </div>
+
+        <button type="button" id="btn-refresh-data" class="btn btn-outline btn-sm" title="Sincronizar datos desde Google Sheets">
+          ↻ Actualizar
+        </button>
+
+        <button type="button" id="btn-new-event" class="btn btn-primary">
+          + Nuevo Evento
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       CONTENIDO PRINCIPAL DE LA APLICACIÓN
+       ======================================================================== -->
+  <main class="main-container">
+
+    <!-- TARJETAS KPI -->
+    <section class="kpi-grid" aria-label="Resumen de cobertura de eventos">
+      <div class="kpi-card" data-kpi-filter="all" title="Ver todos los eventos">
+        <div class="kpi-label">
+          <span>Próximos Eventos</span>
+          <span>📅</span>
+        </div>
+        <div class="kpi-value" id="kpi-total-events">0</div>
+        <div class="kpi-foot">Convocatorias activas en agenda</div>
+      </div>
+
+      <div class="kpi-card kpi-alert" data-kpi-filter="unassigned" title="Filtrar eventos donde aún no va nadie">
+        <div class="kpi-label">
+          <span>Sin Representación</span>
+          <span>⚠️</span>
+        </div>
+        <div class="kpi-value" id="kpi-unassigned-events">0</div>
+        <div class="kpi-foot">Eventos que requieren asignar asistencia</div>
+      </div>
+
+      <div class="kpi-card" data-kpi-filter="covered" title="Filtrar eventos con representación cubierta">
+        <div class="kpi-label">
+          <span>Representación Cubierta</span>
+          <span>✅</span>
+        </div>
+        <div class="kpi-value" id="kpi-covered-events">0</div>
+        <div class="kpi-foot">Con 1 o más representantes confirmadas</div>
+      </div>
+
+      <div class="kpi-card" data-kpi-filter="mine" title="Ver eventos a los que yo he confirmado que voy">
+        <div class="kpi-label">
+          <span>Mi Agenda Confirmada</span>
+          <span>👤</span>
+        </div>
+        <div class="kpi-value" id="kpi-my-events">0</div>
+        <div class="kpi-foot" id="kpi-my-foot">Eventos a los que asistes tú</div>
+      </div>
+    </section>
+
+    <!-- BARRA DE HERRAMIENTAS: Conmutador Lista/Calendario + Filtros -->
+    <section class="toolbar-panel" aria-label="Filtros y vistas de agenda">
+      <div class="view-tabs" role="tablist">
+        <button type="button" id="tab-view-both" class="nav-tab active" data-view="both">
+          📅 Calendario + Agenda
+        </button>
+        <button type="button" id="tab-view-list" class="nav-tab" data-view="list">
+          📋 Solo Lista Detallada
+        </button>
+        <button type="button" id="tab-view-calendar" class="nav-tab" data-view="calendar">
+          🗓️ Solo Calendario Mensual
+        </button>
+        <button type="button" id="tab-view-team" class="nav-tab" data-view="team">
+          👥 Equipo Autorizado (12)
+        </button>
+      </div>
+
+      <div class="filters-group">
+        <input
+          type="search"
+          id="filter-search"
+          class="input-field"
+          placeholder="Buscar por evento, Prodetur, lugar..."
+          style="min-width: 210px;"
+        />
+
+        <select id="filter-type" class="select-field" aria-label="Filtrar por tipo de evento">
+          <option value="all">Todos los tipos</option>
+          <option value="Institucional">Institucional</option>
+          <option value="Networking">Networking</option>
+          <option value="Formacion">Formación</option>
+          <option value="Otro">Otro</option>
+        </select>
+
+        <select id="filter-coverage" class="select-field" aria-label="Filtrar por estado de representación">
+          <option value="all">Cualquier cobertura</option>
+          <option value="unassigned">⚠️ Sin representación aún</option>
+          <option value="covered">✅ Con representación confirmada</option>
+          <option value="mine">👤 Eventos a los que voy yo</option>
+        </select>
+
+        <select id="filter-member" class="select-field" aria-label="Filtrar por integrante">
+          <option value="all">Ver todas las integrantes</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- SECCIÓN CALENDARIO MENSUAL VISUAL -->
+    <section id="section-calendar" class="calendar-wrapper" aria-label="Calendario mensual">
+      <div class="calendar-header">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <button type="button" id="cal-prev-month" class="btn btn-outline btn-sm">← Mes anterior</button>
+          <button type="button" id="cal-today" class="btn btn-outline btn-sm">Hoy</button>
+          <button type="button" id="cal-next-month" class="btn btn-outline btn-sm">Mes siguiente →</button>
+          <button type="button" id="cal-clear-day" class="btn btn-ghost btn-sm hidden">Ver todo el mes ✕</button>
+        </div>
+        <h2 id="cal-month-label" class="calendar-month-title">Noviembre 2026</h2>
+        <div style="display: flex; align-items: center; gap: 0.85rem; font-size: 0.76rem; color: #6e6862;">
+          <span style="display:inline-flex; align-items:center; gap:0.35rem;">
+            <span style="width:10px; height:10px; background:#e66f2d; border-radius:2px; display:inline-block;"></span>
+            Falta representante
+          </span>
+          <span style="display:inline-flex; align-items:center; gap:0.35rem;">
+            <span style="width:10px; height:10px; background:#059669; border-radius:2px; display:inline-block;"></span>
+            Representación cubierta
+          </span>
+        </div>
+      </div>
+
+      <div class="calendar-weekdays">
+        <div class="calendar-weekday">Lun</div>
+        <div class="calendar-weekday">Mar</div>
+        <div class="calendar-weekday">Mié</div>
+        <div class="calendar-weekday">Jue</div>
+        <div class="calendar-weekday">Vie</div>
+        <div class="calendar-weekday">Sáb</div>
+        <div class="calendar-weekday">Dom</div>
+      </div>
+
+      <div id="calendar-grid" class="calendar-grid">
+        <!-- Celdas del mes generadas por app.js -->
+      </div>
+    </section>
+
+    <!-- SECCIÓN LISTA DE EVENTOS Y CONFIRMACIÓN DE ASISTENCIA -->
+    <section id="section-events-list" aria-label="Listado detallado de eventos">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+        <h2 class="font-heading" style="font-size: 1.1rem; margin: 0; color: #1d1b1a;">
+          Convocatorias y Representación (<span id="events-count-label">0</span>)
+        </h2>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" id="btn-export-csv" class="btn btn-outline btn-sm">
+            ⬇ Descargar CSV / Excel
+          </button>
+        </div>
+      </div>
+
+      <div id="events-container" class="events-list">
+        <!-- Tarjetas de eventos generadas dinámicamente por app.js -->
+      </div>
+    </section>
+
+    <!-- SECCIÓN EQUIPO AUTORIZADO -->
+    <section id="section-team" class="calendar-wrapper hidden" style="padding: 1.5rem;" aria-label="Equipo autorizado">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+        <div>
+          <h2 class="font-heading" style="margin:0; font-size:1.15rem; color:#1d1b1a;">
+            Junta Directiva, Vocales y Técnico Autorizadas
+          </h2>
+          <p style="margin:0.25rem 0 0; font-size:0.84rem; color:#6e6862;">
+            Sincronizado con la pestaña <code>EQUIPO_AUTORIZADO</code> del Google Sheet de Empresarias Sevillanas.
+          </p>
+        </div>
+      </div>
+      <div style="overflow-x: auto;">
+        <table style="width:100%; border-collapse: collapse; font-size: 0.85rem;">
+          <thead>
+            <tr style="background:#fbf9f5; border-bottom: 2px solid rgba(29,27,26,0.14); text-align:left;">
+              <th style="padding: 0.65rem;">ID</th>
+              <th style="padding: 0.65rem;">Nombre y Apellidos</th>
+              <th style="padding: 0.65rem;">Cargo</th>
+              <th style="padding: 0.65rem;">Crear Eventos</th>
+              <th style="padding: 0.65rem;">Responder</th>
+              <th style="padding: 0.65rem;">Eventos Confirmados ("Voy")</th>
+            </tr>
+          </thead>
+          <tbody id="team-table-body">
+            <!-- Filas generadas desde EQUIPO_AUTORIZADO -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       MODAL 1: FORMULARIO DIRECTO PARA CREAR O EDITAR EVENTO (COSTE 0€, SIN IA)
+       Por qué solo pedimos como obligatorios el Título y la Fecha:
+       En muchas convocatorias institucionales aún no se sabe la hora de fin,
+       el enlace o el salón exacto. Así cualquier miembro del Comité, Vocal o
+       Técnico puede dar de alta el evento en 15 segundos sin bloqueos.
+       ======================================================================== -->
+  <div id="modal-event" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="modal-event-title" class="modal-title">Registrar Nuevo Evento en Agenda</h2>
+        <button type="button" id="btn-close-event-modal" class="btn btn-ghost btn-sm">✕</button>
+      </div>
+
+      <form id="form-event" class="modal-body">
+        <input type="hidden" id="ev-id" />
+
+        <p style="margin: 0 0 1rem 0; font-size: 0.83rem; color: #6e6862;">
+          Rellena los datos conocidos del evento. Si algún dato aún no se sabe (como la hora de finalización o el enlace), puedes dejarlo en blanco.
+        </p>
+
+        <div class="form-grid">
+          <div class="form-group form-col-full">
+            <label class="form-label" for="ev-titulo">Nombre / Título del evento *</label>
+            <input type="text" id="ev-titulo" class="input-field" placeholder="Ej. Encuentro Empresarial Prodetur · Diputación de Sevilla" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="ev-organizador">Organizador / Entidad (opcional)</label>
+            <input type="text" id="ev-organizador" class="input-field" placeholder="Ej. Prodetur, Cámara de Comercio, CEA..." />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="ev-tipo">Tipo de evento *</label>
+            <select id="ev-tipo" class="select-field" required>
+              <option value="Institucional">Institucional</option>
+              <option value="Networking">Networking</option>
+              <option value="Formacion">Formación</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="ev-fecha-inicio">Fecha del evento *</label>
+            <input type="date" id="ev-fecha-inicio" class="input-field" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="ev-hora-inicio">Hora de inicio (opcional)</label>
+            <input type="time" id="ev-hora-inicio" class="input-field" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="ev-fecha-fin">Fecha fin (solo si dura varios días)</label>
+            <input type="date" id="ev-fecha-fin" class="input-field" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="ev-hora-fin">Hora fin (opcional)</label>
+            <input type="time" id="ev-hora-fin" class="input-field" />
+          </div>
+
+          <div class="form-group form-col-full">
+            <label class="form-label" for="ev-lugar">Lugar / Dirección / Sala (opcional)</label>
+            <input type="text" id="ev-lugar" class="input-field" placeholder="Ej. Sede Prodetur - Avda. Menéndez Pelayo 32, Sevilla (o 'Por confirmar')" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="ev-plazas">Plazas de representación (opcional)</label>
+            <input type="number" id="ev-plazas" class="input-field" min="1" max="30" placeholder="Ej. 2 (dejar vacío si no hay límite)" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="ev-estado">Estado del evento *</label>
+            <select id="ev-estado" class="select-field" required>
+              <option value="Confirmado">Confirmado</option>
+              <option value="Propuesto">Propuesto</option>
+              <option value="Cancelado">Cancelado</option>
+              <option value="Finalizado">Finalizado</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="ev-enlace">Enlace del evento (opcional)</label>
+            <input type="url" id="ev-enlace" class="input-field" placeholder="https://..." />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="ev-creado-por">Registrado por *</label>
+            <select id="ev-creado-por" class="select-field" required>
+            </select>
+          </div>
+
+          <div class="form-group form-col-full">
+            <label class="form-label" for="ev-observaciones">Observaciones / Protocolo (opcional)</label>
+            <textarea id="ev-observaciones" class="textarea-field" rows="3" placeholder="Ej. Requiere confirmar nombre y DNI a protocolo antes del viernes."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="margin: 1.25rem -1.5rem -1.35rem;">
+          <button type="button" id="btn-cancel-event" class="btn btn-outline">Cancelar</button>
+          <button type="submit" id="btn-submit-event" class="btn btn-primary">Guardar en Agenda y Google Sheet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 2: CONFIRMAR ASISTENCIA INDIVIDUAL O MÚLTIPLE (PESTAÑA 'RESPUESTAS')
+       ======================================================================== -->
+  <div id="modal-rsvp" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Confirmar Asistencia / Representación</h2>
+          <p id="rsvp-event-subtitle" style="margin:0.2rem 0 0; font-size:0.82rem; color:#6e6862;"></p>
+        </div>
+        <button type="button" id="btn-close-rsvp-modal" class="btn btn-ghost btn-sm">✕</button>
+      </div>
+
+      <form id="form-rsvp" class="modal-body">
+        <input type="hidden" id="rsvp-event-id" />
+
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+            <label class="form-label">
+              1. Selecciona quién o quiénes responden (puedes marcar 1 o varias compañeras):
+            </label>
+            <button type="button" id="btn-rsvp-only-me" class="btn btn-ghost btn-sm" style="font-size:0.74rem;">
+              Marcarme solo a mí
+            </button>
+          </div>
+
+          <input
+            type="search"
+            id="rsvp-member-search"
+            class="input-field"
+            placeholder="Filtrar nombre de miembro del comité o vocal..."
+            style="margin-bottom: 0.45rem;"
+          />
+          <div id="rsvp-members-checklist" class="members-checklist">
+          </div>
+        </div>
+
+        <div class="form-grid" style="margin-bottom: 1rem;">
+          <div class="form-group">
+            <label class="form-label" for="rsvp-status">2. Disponibilidad (`respuesta`) *</label>
+            <select id="rsvp-status" class="select-field" required>
+              <option value="Voy">✅ Sí, puedo asistir (Voy)</option>
+              <option value="No puedo">❌ No puedo asistir (No puedo)</option>
+              <option value="Pendiente">⏳ Pendiente de confirmar (Pendiente)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="rsvp-rep-confirmada">3. ¿Acude en representación oficial? *</label>
+            <select id="rsvp-rep-confirmada" class="select-field" required>
+              <option value="Si">Sí (Representante confirmada)</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="rsvp-observaciones">Observaciones (opcional)</label>
+          <input
+            type="text"
+            id="rsvp-observaciones"
+            class="input-field"
+            placeholder="Ej. Voy en representación junto con la Presidenta / Llego a las 11:00h"
+          />
+        </div>
+
+        <div class="modal-footer" style="margin: 1.25rem -1.5rem -1.35rem;">
+          <button type="button" id="btn-cancel-rsvp" class="btn btn-outline">Cancelar</button>
+          <button type="submit" id="btn-submit-rsvp" class="btn btn-primary">Guardar Confirmación</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 3: CONFIGURACIÓN DE CONEXIÓN N8N Y PIN DE ACCESO
+       ======================================================================== -->
+  <div id="modal-settings" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card" style="max-width: 560px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Conexión con n8n y Google Sheets</h2>
+        <button type="button" id="btn-close-settings-modal" class="btn btn-ghost btn-sm">✕</button>
+      </div>
+      <form id="form-settings" class="modal-body" style="display:flex; flex-direction:column; gap:1rem;">
+        <p style="margin:0; font-size:0.84rem; color:#6e6862;">
+          La aplicación se comunica con el workflow <strong>Agenda Comité - Empresarias Sevillanas</strong> en tu servidor n8n para leer y escribir en las pestañas <code>EVENTOS</code>, <code>RESPUESTAS</code> y <code>EQUIPO_AUTORIZADO</code>, y usar el nodo de IA para extraer invitaciones.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label" for="cfg-webhook-base">URL Base de Webhooks en n8n</label>
+          <input
+            type="url"
+            id="cfg-webhook-base"
+            class="input-field"
+            placeholder="https://n8n-n8n.npfusf.easypanel.host/webhook"
+            required
+          />
+          <small style="color:#6e6862; font-size:0.75rem;">
+            Endpoints: <code>/agenda-comite-datos</code> (GET), <code>/agenda-comite-evento</code> (POST), <code>/agenda-comite-asistencia</code> (POST) y <code>/agenda-comite-extraer-ia</code> (POST).
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="cfg-pin">PIN de acceso para la Junta Directiva</label>
+          <input type="text" id="cfg-pin" class="input-field" value="2026" required />
+        </div>
+
+        <div class="modal-footer" style="margin: 0.5rem -1.5rem -1.35rem;">
+          <button type="button" id="btn-test-connection" class="btn btn-outline">Probar lectura n8n</button>
+          <button type="submit" class="btn btn-primary">Guardar configuración</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Contenedor de avisos flotantes -->
+  <div id="toast-container" class="toast-container"></div>
+
+</body>
+</html>

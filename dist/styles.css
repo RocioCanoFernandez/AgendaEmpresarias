@@ -1,0 +1,940 @@
+/* ==========================================================================
+   IDENTIDAD VISUAL: EMPRESARIAS SEVILLANAS · AGENDA DEL COMITÉ Y VOCALES
+   Por qué esta paleta de colores:
+   Se alinea con la identidad oficial de la asociación Empresarias Sevillanas
+   (logotipo oficial con la "S" bicolor naranja/ámbar y la estética editorial
+   de la candidatura de Mariló Caro):
+   - Tinta principal (--ink): #1d1b1a (Negro cálido institucional)
+   - Papel base (--paper): #fbf9f5 y #f0ece5 (Marfil cálido editorial)
+   - Blanco puro (--white): #ffffff (Tarjetas, calendario y modales)
+   - Naranja Empresarias Sevillanas (--orange): #e66f2d / #b94817
+   - Ámbar secundario del logo (--amber): #ef8c13
+   - Texto secundario (--muted): #6e6862
+   ========================================================================== */
+
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #fbf9f5;
+  --bg-muted: #f0ece5;
+  --text-primary: #1d1b1a;
+  --text-main: #2c2927;
+  --text-secondary: #6e6862;
+  --accent-orange: #e66f2d;
+  --accent-orange-hover: #b94817;
+  --accent-amber: #ef8c13;
+  --accent-orange-soft: #fdf3ec;
+  --border-color: rgba(29, 27, 26, 0.14);
+  --border-strong: rgba(29, 27, 26, 0.26);
+  --success-bg: #ecfdf5;
+  --success-text: #065f46;
+  --success-border: #a7f3d0;
+  --warning-bg: #fffbeb;
+  --warning-text: #92400e;
+  --warning-border: #fde68a;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-xs: 0 1px 3px rgba(29, 27, 26, 0.05);
+  --shadow-sm: 0 4px 14px rgba(29, 27, 26, 0.07);
+  --shadow-md: 0 10px 28px rgba(29, 27, 26, 0.11);
+  --shadow-lg: 0 22px 44px rgba(29, 27, 26, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-secondary);
+  color: var(--text-main);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, .font-heading, .btn, .nav-tab, .badge-type {
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* ==========================================================================
+   CABECERA SUPERIOR CON LOGOTIPO OFICIAL DE EMPRESARIAS SEVILLANAS
+   ========================================================================== */
+.top-header {
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  border-top: 4px solid var(--accent-orange);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  box-shadow: var(--shadow-xs);
+}
+
+.header-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.brand-block {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.brand-logo {
+  height: 46px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.brand-divider {
+  width: 1px;
+  height: 32px;
+  background-color: var(--border-color);
+}
+
+@media (max-width: 580px) {
+  .brand-logo {
+    height: 38px;
+  }
+  .brand-divider {
+    display: none;
+  }
+}
+
+.brand-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.brand-subtitle {
+  font-size: 0.77rem;
+  color: var(--text-secondary);
+  margin: 0.15rem 0 0 0;
+}
+
+/* Selector rápido de usuaria activa en la barra superior */
+.user-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.active-user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.81rem;
+  color: var(--text-main);
+}
+
+.sync-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.sync-dot.online {
+  background-color: #10B981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
+}
+
+.sync-dot.local {
+  background-color: var(--accent-amber);
+  box-shadow: 0 0 0 3px rgba(239, 140, 19, 0.2);
+}
+
+/* ==========================================================================
+   SISTEMA DE BOTONES (IDENTIDAD EMPRESARIAS SEVILLANAS)
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Botón primario: Naranja corporativo de Empresarias Sevillanas (#e66f2d) */
+.btn-primary {
+  background-color: var(--accent-orange);
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(230, 111, 45, 0.25);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--accent-orange-hover);
+  transform: translateY(-1px);
+}
+
+/* Botón secundario negro cálido institucional (#1d1b1a) */
+.btn-dark {
+  background-color: var(--text-primary);
+  color: #FFFFFF;
+}
+
+.btn-dark:hover:not(:disabled) {
+  background-color: #33302e;
+}
+
+/* Botón outline limpio */
+.btn-outline {
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  border-color: var(--border-strong);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: var(--bg-muted);
+  border-color: var(--text-primary);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--text-secondary);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background-color: var(--bg-muted);
+  color: var(--text-primary);
+}
+
+.btn-sm {
+  padding: 0.38rem 0.72rem;
+  font-size: 0.78rem;
+}
+
+/* ==========================================================================
+   TARJETAS KPI DE RESUMEN EJECUTIVO
+   ========================================================================== */
+.main-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3.5rem;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 960px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kpi-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.1rem 1.25rem;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+}
+
+.kpi-card:hover {
+  border-color: var(--accent-orange);
+  box-shadow: var(--shadow-sm);
+}
+
+.kpi-card.kpi-alert {
+  border-left: 4px solid var(--accent-orange);
+}
+
+.kpi-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kpi-value {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0.35rem 0 0.15rem;
+  line-height: 1.1;
+}
+
+.kpi-card.kpi-alert .kpi-value {
+  color: var(--accent-orange);
+}
+
+.kpi-foot {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   BARRA DE CONTROLES, FILTROS Y PESTAÑAS DE VISTA
+   ========================================================================== */
+.toolbar-panel {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.view-tabs {
+  display: inline-flex;
+  background-color: var(--bg-muted);
+  padding: 0.25rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.nav-tab {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.81rem;
+  font-weight: 600;
+  padding: 0.45rem 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.15s ease;
+}
+
+.nav-tab.active {
+  background-color: var(--bg-primary);
+  color: var(--accent-orange-hover);
+  box-shadow: var(--shadow-xs);
+}
+
+.filters-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.input-field, .select-field, .textarea-field {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.86rem;
+  color: var(--text-main);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 0.52rem 0.75rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input-field:focus, .select-field:focus, .textarea-field:focus {
+  border-color: var(--accent-orange);
+  box-shadow: 0 0 0 3px rgba(230, 111, 45, 0.15);
+}
+
+/* ==========================================================================
+   VISTA 1: CALENDARIO MENSUAL INTERACTIVO
+   ========================================================================== */
+.calendar-wrapper {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.calendar-month-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background-color: var(--bg-muted);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.calendar-weekday {
+  padding: 0.6rem 0.5rem;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-cell {
+  min-height: 118px;
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.45rem;
+  background-color: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  transition: background-color 0.12s ease;
+}
+
+.calendar-cell:nth-child(7n) {
+  border-right: none;
+}
+
+.calendar-cell.other-month {
+  background-color: #f8f6f2;
+  color: #b5afa8;
+}
+
+.calendar-cell.is-today {
+  background-color: var(--accent-orange-soft);
+}
+
+.calendar-cell.selected-day {
+  outline: 2px solid var(--accent-orange);
+  outline-offset: -2px;
+}
+
+.day-number-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.15rem;
+}
+
+.day-number {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.calendar-cell.is-today .day-number {
+  background-color: var(--accent-orange);
+  color: #FFFFFF;
+}
+
+.cal-event-pill {
+  font-size: 0.72rem;
+  padding: 0.25rem 0.42rem;
+  border-radius: 4px;
+  background-color: var(--bg-muted);
+  border-left: 3px solid var(--text-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.cal-event-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-xs);
+}
+
+/* Si al evento aún no va nadie: Naranja Empresarias Sevillanas para destacar que requiere representante */
+.cal-event-pill.unassigned {
+  background-color: var(--accent-orange-soft);
+  border-left-color: var(--accent-orange);
+  color: var(--accent-orange-hover);
+  font-weight: 600;
+}
+
+/* Si el evento ya tiene representación confirmada: verde esmeralda */
+.cal-event-pill.covered {
+  background-color: var(--success-bg);
+  border-left-color: #059669;
+  color: var(--success-text);
+}
+
+@media (max-width: 768px) {
+  .calendar-cell {
+    min-height: 78px;
+    padding: 0.25rem;
+  }
+  .cal-event-pill {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.25rem;
+  }
+}
+
+/* ==========================================================================
+   VISTA 2: TARJETAS DE EVENTOS Y CONFIRMACIÓN DE REPRESENTACIÓN
+   ========================================================================== */
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.event-card {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.35rem 1.5rem;
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow 0.16s ease, border-color 0.16s ease;
+  display: grid;
+  grid-template-columns: 92px 1fr 310px;
+  gap: 1.35rem;
+  align-items: start;
+}
+
+.event-card:hover {
+  box-shadow: var(--shadow-sm);
+  border-color: var(--border-strong);
+}
+
+.event-card.needs-rep {
+  border-left: 4px solid var(--accent-orange);
+}
+
+.event-card.has-rep {
+  border-left: 4px solid #059669;
+}
+
+@media (max-width: 960px) {
+  .event-card {
+    grid-template-columns: 80px 1fr;
+  }
+  .event-attendance-box {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 580px) {
+  .event-card {
+    grid-template-columns: 1fr;
+    padding: 1.1rem;
+  }
+}
+
+/* Bloque de fecha lateral tipo calendario */
+.event-date-badge {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-top: 3px solid var(--accent-orange);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.event-date-month {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-orange);
+}
+
+.event-date-day {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.1;
+  margin: 0.15rem 0;
+}
+
+.event-date-weekday {
+  font-size: 0.73rem;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+/* Bloque central de información del evento */
+.event-info-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.45rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.badge-type {
+  background-color: var(--text-primary);
+  color: #FFFFFF;
+  letter-spacing: 0.02em;
+}
+
+.badge-status-Confirmado {
+  background-color: var(--success-bg);
+  color: var(--success-text);
+  border: 1px solid var(--success-border);
+}
+
+.badge-status-Propuesto {
+  background-color: var(--warning-bg);
+  color: var(--warning-text);
+  border: 1px solid var(--warning-border);
+}
+
+.badge-status-Cancelado {
+  background-color: var(--accent-orange-soft);
+  color: var(--accent-orange-hover);
+  border: 1px solid #f7c6a8;
+}
+
+.badge-status-Finalizado {
+  background-color: var(--bg-muted);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.event-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem 0;
+}
+
+.event-organizer {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--accent-orange-hover);
+  margin-bottom: 0.55rem;
+}
+
+.event-meta-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem 1.25rem;
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.65rem;
+}
+
+.event-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.event-notes {
+  font-size: 0.83rem;
+  color: var(--text-main);
+  background-color: var(--bg-secondary);
+  border-left: 3px solid var(--accent-amber);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0 4px 4px 0;
+  margin-top: 0.5rem;
+}
+
+/* Bloque derecho de representación y quién asiste */
+.event-attendance-box {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rep-status-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.attendee-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+}
+
+.attendee-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.79rem;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+}
+
+.attendee-chip.going {
+  border-left: 3px solid #059669;
+}
+
+.attendee-chip.not-going {
+  opacity: 0.72;
+  border-left: 3px solid #9CA3AF;
+}
+
+/* ==========================================================================
+   MODALES (CONFIRMAR ASISTENCIA MULTI-PERSONA Y CREAR/EDITAR EVENTO)
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(29, 27, 26, 0.58);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 100;
+}
+
+.modal-backdrop.hidden {
+  display: none !important;
+}
+
+.modal-card {
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 680px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 1.15rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.modal-body {
+  padding: 1.35rem 1.5rem;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.65rem;
+}
+
+/* Grid de formularios */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.95rem;
+}
+
+.form-col-full {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 580px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Lista seleccionable de compañeras del Comité y Vocales (Multi-select) */
+.members-checklist {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 560px) {
+  .members-checklist {
+    grid-template-columns: 1fr;
+  }
+}
+
+.member-check-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.48rem 0.65rem;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.82rem;
+  transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+
+.member-check-item:hover {
+  border-color: var(--accent-orange);
+}
+
+.member-check-item.checked {
+  border-color: var(--accent-orange);
+  background-color: var(--accent-orange-soft);
+}
+
+.member-role-tag {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  display: block;
+}
+
+/* Asistente inteligente de pegado de invitación con IA en n8n */
+.smart-paste-box {
+  background-color: var(--accent-orange-soft);
+  border: 1px dashed var(--accent-orange);
+  border-radius: var(--radius-md);
+  padding: 0.95rem 1.1rem;
+  margin-bottom: 1.15rem;
+}
+
+/* Notificación flotante (Toast) */
+.toast-container {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 150;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toast {
+  background-color: var(--text-primary);
+  color: #FFFFFF;
+  padding: 0.75rem 1.1rem;
+  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--accent-orange);
+  box-shadow: var(--shadow-md);
+  font-size: 0.84rem;
+  font-weight: 500;
+  max-width: 360px;
+}
+
+.hidden {
+  display: none !important;
+}
